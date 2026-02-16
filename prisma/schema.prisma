@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Teacher {
+  id                String         @id @default(cuid())
+  name              String
+  email             String         @unique
+  googleAccessToken String?
+  googleRefreshToken String?
+  slug              String         @unique
+  timezone          String         @default("UTC")
+  createdAt         DateTime       @default(now())
+  availabilities    Availability[]
+  bookings          Booking[]
+}
+
+model Availability {
+  id          String   @id @default(cuid())
+  teacherId   String
+  teacher     Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int      // 0=Sunday, 1=Monday, ..., 6=Saturday
+  startTime   String   // "09:00"
+  endTime     String   // "10:00"
+  isRecurring Boolean  @default(true)
+
+  @@unique([teacherId, dayOfWeek, startTime])
+}
+
+model Booking {
+  id           String   @id @default(cuid())
+  teacherId    String
+  teacher      Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  studentName  String
+  studentEmail String   @default("")
+  subjectName  String
+  notes        String   @default("")
+  startTime    DateTime
+  endTime      DateTime
+  meetingLink    String?
+  googleEventId  String?
+  status         String   @default("confirmed") // confirmed | cancelled
+  createdAt    DateTime @default(now())
+}
