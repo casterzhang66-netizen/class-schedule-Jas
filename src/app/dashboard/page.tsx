@@ -92,7 +92,9 @@ export default function DashboardPage() {
     setWeekStart(d);
   };
 
-  const bookingLink = `http://localhost:8888/book/${slug}`;
+  const bookingLink = typeof window !== "undefined"
+    ? `${window.location.origin}/book/${slug}`
+    : `/book/${slug}`;
 
   const copyLink = () => {
     navigator.clipboard.writeText(bookingLink);
