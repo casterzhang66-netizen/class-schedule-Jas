@@ -45,54 +45,84 @@ export default function AvailabilityPage() {
     });
   };
 
-  if (loading) return <p>Loading availability...</p>;
+  if (loading) {
+    return (
+      <div className="flex items-center gap-3 text-text-secondary py-12 justify-center">
+        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        <span className="text-sm font-medium">Loading availability...</span>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Availability Settings</h1>
-      <p className="text-gray-600 mb-4">
-        All slots are open by default. Click to lock/unlock. This repeats every week.
-      </p>
-      <div className="overflow-x-auto">
-        <table className="border-collapse border text-sm">
-          <thead>
-            <tr>
-              <th className="border p-2 bg-gray-50">Time</th>
-              {DAYS.map((d) => (
-                <th key={d} className="border p-2 bg-gray-50 w-36">
-                  {d}
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold text-text-primary mb-1">Availability Settings</h1>
+        <p className="text-sm text-text-secondary">
+          All slots are open by default. Click to toggle availability. This repeats every week.
+        </p>
+      </div>
+
+      {/* Color legend */}
+      <div className="flex items-center gap-6 mb-4 text-sm text-text-secondary">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-emerald-50 border border-emerald-200" />
+          <span>Available</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-red-50 border border-red-200" />
+          <span>Unavailable</span>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-card overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr>
+                <th className="p-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider bg-surface-secondary border-b border-border">
+                  Time
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {HOURS.map((hour) => (
-              <tr key={hour}>
-                <td className="border p-2 text-right whitespace-nowrap bg-gray-50">
-                  {hour.toString().padStart(2, "0")}:00-
-                  {(hour + 1).toString().padStart(2, "0")}:00
-                </td>
-                {DAYS.map((_, dayIndex) => {
-                  const key = `${dayIndex}-${hour.toString().padStart(2, "0")}:00`;
-                  const isLocked = slots.has(key);
-                  return (
-                    <td
-                      key={dayIndex}
-                      onClick={() => toggle(dayIndex, hour)}
-                      className={`border p-2 text-center cursor-pointer select-none ${
-                        isLocked
-                          ? "bg-gray-200 hover:bg-gray-300"
-                          : "bg-green-100 hover:bg-green-200"
-                      }`}
-                    >
-                      {isLocked ? "🔒" : ""}
-                    </td>
-                  );
-                })}
+                {DAYS.map((d) => (
+                  <th key={d} className="p-3 text-center text-xs font-medium text-text-tertiary uppercase tracking-wider bg-surface-secondary border-b border-border w-[calc(100%/8)]">
+                    {d}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {HOURS.map((hour) => (
+                <tr key={hour} className="border-b border-border-light last:border-b-0">
+                  <td className="p-3 text-right whitespace-nowrap text-xs text-text-tertiary font-medium bg-surface-secondary/50">
+                    {hour.toString().padStart(2, "0")}:00
+                  </td>
+                  {DAYS.map((_, dayIndex) => {
+                    const key = `${dayIndex}-${hour.toString().padStart(2, "0")}:00`;
+                    const isLocked = slots.has(key);
+                    return (
+                      <td
+                        key={dayIndex}
+                        onClick={() => toggle(dayIndex, hour)}
+                        className={`p-2 text-center cursor-pointer select-none transition-colors border-l border-border-light ${
+                          isLocked
+                            ? "bg-red-50 hover:bg-red-100"
+                            : "bg-emerald-50 hover:bg-emerald-100"
+                        }`}
+                      >
+                        {isLocked && (
+                          <div className="w-1.5 h-1.5 rounded-full bg-red-400 mx-auto" />
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
